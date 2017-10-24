@@ -1,0 +1,4 @@
+AM_CPPFLAGS = -I../src
+AM_CFLAGS = @WARNINGS@ -D TESTS
+
+TESTS = $(check_PROGRAMS)
