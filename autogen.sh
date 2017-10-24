@@ -11,7 +11,7 @@ git submodule update -i
 # build libdill
 #
 cd deps/libdill
-autoreconf -ivf
+./autogen.sh
 ./configure --disable-shared --disable-threads
 make
 make check
