@@ -10,13 +10,71 @@
 #include "evheap.h"
 
 
-int main( int argc, const char *argv[] )
+#define TOSTR(v)        TOSTRX(v)
+#define TOSTRX(v)       #v
+
+#define DEFAULT_HOST    "127.0.0.1"
+#define DEFAULT_PORT    1025
+
+typedef struct {
+    const char *host;
+    int port;
+} cfg_t;
+
+
+static void getcfg( cfg_t *cfg, int argc, char * const argv[] )
+{
+    const char *optstr = "p:h:";
+    int opt = getopt( argc, argv, optstr );
+
+    while( opt != -1 )
+    {
+        switch(opt){
+            // number of workers
+            // case 'w':
+            //     opts.nproc = atoi(optarg);
+            //     break;
+
+            // host
+            case 'h':
+                cfg->host = optarg;
+                break;
+
+            // port number
+            case 'p':
+                cfg->port = atoi( optarg );
+                if( cfg->port >= 0 && cfg->port <= 0xFFFF ){
+                    break;
+                }
+                printf( "invalid port-range\n" );
+
+            default:
+                printf(
+                    "Usage: evheap [-p port] [-h host]\n"
+                    "default opts\n"
+                    "   host | " TOSTR(DEFAULT_HOST) "\n"
+                    "   port | " TOSTR(DEFAULT_PORT) "\n"
+                    "\n"
+                );
+                exit( EXIT_FAILURE );
+        }
+
+        opt = getopt( argc, argv, optstr );
+    }
+}
+
+
+int main( int argc, char * const argv[] )
 {
     server_t s = server_init();
     int ch = 0;
+    cfg_t cfg = {
+        .host = DEFAULT_HOST,
+        .port = DEFAULT_PORT,
+    };
 
-    (void)argc;
-    (void)argv;
+    getcfg( &cfg, argc, argv );
+
     // disable buffering
     setvbuf( stdout, NULL, _IONBF, 0 );
     setvbuf( stderr, NULL, _IONBF, 0 );
@@ -27,7 +85,7 @@ int main( int argc, const char *argv[] )
     }
 
     // create server socket
-    if( server_listen( &s, "127.0.0.1", 1025 ) == 0 )
+    if( server_listen( &s, cfg.host, cfg.port ) == 0 )
     {
         char strbuf[SERVER_ADDRLEN] = {0};
         int signo = 0;
@@ -52,5 +110,4 @@ int main( int argc, const char *argv[] )
 
     return EXIT_FAILURE;
 }
-
 
