@@ -8,63 +8,66 @@
 */
 
 #include "evheap.h"
-#include "../deps/libdill/libdillimpl.h"
 
 
 coroutine static void handle_connection( int sock )
 {
     int64_t deadline = -1;
-    ssize_t len = 0;
     char buf[BUFSIZ] = { 0 };
+    ssize_t len = rawio_recv( sock, buf, BUFSIZ, deadline );
 
-    while(1)
+    while( len > 0 )
     {
-        len = mrecv( sock, buf, sizeof( buf ), deadline );
-        if( len != -1 && msend( sock, buf, len, -1 ) == 0 ){
-            continue;
+        if( rawio_send( sock, buf, len, deadline ) != len ){
+            break;
         }
-        break;
+
+        len = rawio_recv( sock, buf, BUFSIZ, deadline );
     }
 
-    switch( errno )
+    // if not closed by peer
+    if( len == -1 )
     {
-        // Deadline was reached.
-        case ETIMEDOUT:
-            if( len == -1 ){
-                msend( sock, "timed-out", -1, -1 );
-            }
-            break;
+        switch( errno )
+        {
+            // Deadline was reached.
+            case ETIMEDOUT:
+                if( len == -1 ){
+                    msend( sock, "timed-out", -1, -1 );
+                }
+                break;
 
-        // Not enough memory.
-        case ENOMEM:
-            if( len == -1 ){
-                msend( sock, "internal server error", -1, -1 );
-            }
-            break;
+            // Not enough memory.
+            case ENOMEM:
+                if( len == -1 ){
+                    msend( sock, "internal server error", -1, -1 );
+                }
+                break;
 
-        // Current coroutine is in the process of shutting down.
-        case ECANCELED:
-            perror("coroutine canceled");
-            break;
+            // Current coroutine is in the process of shutting down.
+            case ECANCELED:
+                perror("coroutine canceled");
+                break;
 
-        // Closed connection.
-        case EPIPE:
-        // Broken connection.
-        case ECONNRESET:
-            // TODO: print only on debug mode
-            // perror("connection closed by peer");
-            break;
+            // Closed connection.
+            case EPIPE:
+            // Broken connection.
+            case ECONNRESET:
+                // TODO: print only on debug mode
+                // perror("connection closed by peer");
+                break;
 
-        // The socket handle in invalid.
-        // case EBADF:
-        // Invalid arguments.
-        // case EINVAL:
-        // The message was larger than the supplied buffer.
-        // case EMSGSIZE:
-        // The operation is not supported by the socket.
-        // case ENOTSUP:
-        default:
-            perror("failed to handle_connection()");
+            // The socket handle in invalid.
+            // case EBADF:
+            // Invalid arguments.
+            // case EINVAL:
+            // The message was larger than the supplied buffer.
+            // case EMSGSIZE:
+            // The operation is not supported by the socket.
+            // case ENOTSUP:
+            default:
+                perror("failed to handle_connection()");
+        }
     }
 
     if( hclose( sock ) == -1 ){
@@ -82,15 +85,8 @@ coroutine static void handle_accept( server_t *s )
 
         if( sock != -1 )
         {
-            int cr = crlf_attach( sock );
-
-            if( cr != -1 )
-            {
-                sock = cr;
-                if( go( handle_connection( sock ) ) != -1 ){
-                    continue;
-                }
-                crlf_detach( cr, -1 );
+            if( go( handle_connection( sock ) ) != -1 ){
+                continue;
             }
             hclose( sock );
         }

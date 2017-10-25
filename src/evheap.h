@@ -51,4 +51,8 @@ void server_close( server_t *s );
 #define server_port(s)      ipaddr_port( &(s)->addr )
 
 
+ssize_t rawio_recv( int sock, char *buf, size_t len, int64_t deadline );
+ssize_t rawio_send( int sock, char *buf, size_t len, int64_t deadline );
+
+
 #endif
