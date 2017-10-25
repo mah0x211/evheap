@@ -9,17 +9,17 @@
 
 #include "evheap.h"
 
-coroutine static void worker(const char *text)
-{
-    while(1) {
-        printf("%s\n", text);
-        msleep(now() + random() % 500);
-    }
-}
-
 
 int main( int argc, const char *argv[] )
 {
+    int ch = sigch_init();
+    int signo = 0;
+
+    if( ch == -1 ){
+        perror("failed to initialize sigch");
+        exit(1);
+    }
+
     (void)argc;
     (void)argv;
 
@@ -27,10 +27,19 @@ int main( int argc, const char *argv[] )
     setvbuf( stdout, NULL, _IONBF, 0 );
     setvbuf( stderr, NULL, _IONBF, 0 );
 
-    go( worker("hello world!") );
-    msleep( now() + 1000 );
+    // wait signal
+    while( chrecv( ch, (void*)&signo, sizeof(signo), -1 ) == 0 ){
+        printf("got signal %d\n", signo );
+        break;
+    }
+
+    hclose( ch );
+    printf("chdone\n");
+
+    // hclose( server );
     printf("done\n");
 
     return EXIT_SUCCESS;
 }
+
 

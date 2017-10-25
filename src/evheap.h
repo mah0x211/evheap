@@ -13,5 +13,11 @@
 #include "../deps/libdill/libdill.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+
+int sigch_init( void );
+
 
 #endif
