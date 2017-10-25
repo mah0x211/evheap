@@ -25,12 +25,16 @@ ssize_t rawio_recv( int sock, char *buf, size_t len, int64_t deadline )
 
 RECV_AGAIN:
     rv = recv( fd, buf, len, 0 );
-    if( rv == -1 &&
-        ( errno == EINTR || ( is_eagain() && fdin( fd, deadline ) == 0 ) ) ){
-        goto RECV_AGAIN;
-    }
+    switch( rv )
+    {
+        case -1:
+            if( errno == EINTR || ( is_eagain() && fdin( fd, deadline ) == 0 ) ){
+                goto RECV_AGAIN;
+            }
 
-    return rv;
+        default:
+            return rv;
+    }
 }
 
 
@@ -41,22 +45,22 @@ ssize_t rawio_send( int sock, char *buf, size_t len, int64_t deadline )
 
 SEND_AGAIN:
     rv = send( fd, buf, len, 0 );
-    switch( rv ){
+    switch( rv )
+    {
         case -1:
             if( errno == EINTR ||
                 ( is_eagain() && fdout( fd, deadline ) == 0 ) ){
                 goto SEND_AGAIN;
             }
         case 0:
-            break;
+            return rv;
 
         default:
             len -= (size_t)rv;
             if( len ){
                 goto SEND_AGAIN;
             }
+            return rv;
     }
-
-    return rv;
 }
 
