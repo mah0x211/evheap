@@ -88,14 +88,14 @@ int main( int argc, char * const argv[] )
     if( server_listen( &s, cfg.host, cfg.port ) == 0 )
     {
         char strbuf[SERVER_ADDRLEN] = {0};
-        int signo = 0;
+        int sig = 0;
 
         printf( "server listening on %s:%d\n", server_addr( &s, strbuf ),
                 server_port( &s ) );
 
         // wait signal
-        while( chrecv( ch, (void*)&signo, sizeof(signo), -1 ) == 0 ){
-            printf("got signal %d\n", signo );
+        while( chrecv( ch, (void*)&sig, sizeof( sig ), -1 ) == 0 ){
+            printf("got signal %d\n", sig );
             break;
         }
 

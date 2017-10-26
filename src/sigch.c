@@ -19,14 +19,14 @@ coroutine static void recvsig( int ch )
 {
     while(1)
     {
-        int signo = -1;
+        int sig = -1;
 
         // wait signal
         if( fdin( FD_RCV, -1 ) == 0 ){
-            read( FD_RCV, &signo, sizeof(signo) );
+            read( FD_RCV, &sig, sizeof( sig ) );
         }
 
-        if( chsend( ch, (void*)&signo, sizeof(int), -1 ) != 0 || signo == -1 ){
+        if( chsend( ch, (void*)&sig, sizeof( sig ), -1 ) != 0 || sig == -1 ){
             perror("failed to recvsig()");
             close( FD_RCV );
             FD_RCV = -1;
@@ -36,10 +36,10 @@ coroutine static void recvsig( int ch )
 }
 
 
-static void sendch( int signo )
+static void sendch( int sig )
 {
     // forward signo to pipe
-    if( write( FD_SND, (void*)&signo, sizeof(int) ) == -1 ){
+    if( write( FD_SND, (void*)&sig, sizeof( sig ) ) == -1 ){
         perror("failed to write(FD_SND)");
         close( FD_SND );
         FD_SND = -1;
@@ -61,7 +61,7 @@ int sigch_init( void )
         FD_RCV = fds[0];
         FD_SND = fds[1];
 
-        memset( (void*)&act, 0, sizeof( struct sigaction ) );
+        memset( (void*)&act, 0, sizeof( act ) );
         act.sa_handler = sendch;
         act.sa_flags = SA_RESTART;
 
@@ -71,7 +71,7 @@ int sigch_init( void )
             sigprocmask( SIG_BLOCK, &sblk, NULL ) == 0 &&
             sigaction( SIGINT, &act, NULL ) != -1 &&
             // create channel
-            ( ch = chmake(sizeof(int)) ) != -1 )
+            ( ch = chmake( sizeof( ch ) ) ) != -1 )
         {
             // wait a signal with coroutine
             if( go( recvsig( ch ) ) != -1 ){

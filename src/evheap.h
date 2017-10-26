@@ -41,16 +41,22 @@ void server_close( server_t *s );
 
 
 /**
- * e.g.
- *
- *  char strbuf[SERVER_ADDRLEN] = {0};
- *  printf( "hostname: %s\n", server_addr( &s, strbuf );
+ *  e.g.
+ *    char buf[SERVER_ADDRLEN] = {0};
+ *    printf( "host: %s:%d\n", server_addr( &s, buf ), server_port( &s ) );
  */
 #define SERVER_ADDRLEN      IPADDR_MAXSTRLEN
 #define server_addr(s, buf) ipaddr_str(&(s)->addr, (buf))
 #define server_port(s)      ipaddr_port( &(s)->addr )
 
 
+/**
+ *  e.g.
+ *    char buf[BUFSIZ] = { 0 };
+ *    int sock = tcp_accept( s, NULL, -1 );
+ *    ssize_t len = rawio_recv( sock, buf, BUFSIZ, deadline );
+ *    ssize_t sent = rawio_send( sock, buf, len, deadline );
+ */
 ssize_t rawio_recv( int sock, char *buf, size_t len, int64_t deadline );
 ssize_t rawio_send( int sock, char *buf, size_t len, int64_t deadline );
 #define rawio_recvn(sock, buf, len, deadline) brecv( sock, buf, len, deadline)
