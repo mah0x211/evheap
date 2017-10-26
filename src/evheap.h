@@ -51,6 +51,139 @@ void server_close( server_t *s );
 
 
 /**
+ * Message Format Specification
+ *
+ *  ---------+----------+---------+----------
+ *  message header: 8 octets
+ *  ---------+----------+---------+----------
+ *  message body: 4 or 8 octets + payload
+ *  ---------+----------+---------+----------
+ *
+ *
+ *  message header
+ *  ---------+----------+---------+----------
+ *  type     | id ...
+ *  ---------+----------+---------+----------
+ *  1 octet    7 octets
+ *
+ *  type values
+ *  --------+------------ for Response
+ *  ok      | 0000 0001 | 0x1
+ *  data    | 0000 0010 | 0x2
+ *  err     | 0000 0011 | 0x3
+ *  --------+------------ for Request
+ *  close   | 1000 0000 | 0x80
+ *  ping    | 1000 0001 | 0x81
+ *  push    | 1000 0010 | 0x82
+ *  pull    | 1000 0011 | 0x83
+ *  --------+------------
+ *
+ *
+ *  message body 4 octets + payload
+ *  ---------+----------+----------+---------
+ *  key-size            | payload ...
+ *  ---------+----------+----------+---------
+ *
+ *  message body 4 + 4 octets + payload
+ *  ---------+----------+----------+---------
+ *  key-size            | val-size
+ *  ---------+----------+----------+---------
+ *  payload ...
+ *  ---------+----------+----------+---------
+ *
+ *
+ *  list of byte sequences
+ *  --------+----+-----+-----+----+----
+ *  close   | id
+ *  --------+----+-----+-----+----+----
+ *  ping    | id
+ *  --------+----+-----+-----+----+----
+ *  pull    | id | ksz | payload
+ *  --------+----+-----+-----+----+----
+ *  push    | id | ksz | vsz | payload
+ *  --------+----+-----+-----+----+----
+ *  ok      | id
+ *  --------+----+-----+-----+----+----
+ *  err     | id | vsz | payload
+ *  --------+----+-----+-----+----+----
+ *  data    | id | vsz | payload
+ *  --------+----+-----+-----+----+----
+ */
+enum {
+    // response
+    MSG_RES_OK = 0x1,
+    MSG_RES_DATA,
+    MSG_RES_ERR,
+    // request
+    MSG_REQ_CLOSE = 0x80,
+    MSG_REQ_PING,
+    MSG_REQ_PUSH,
+    MSG_REQ_PULL
+};
+
+
+/**
+ *  message byte sequences
+ *  --------+----+-----+-----+----+----
+ *  close   | id
+ *  --------+----+-----+-----+----+----
+ *  ping    | id
+ *  --------+----+-----+-----+----+----
+ *  ok      | id
+ *  --------+----+-----+-----+----+----
+ */
+typedef struct __attribute__((packed)){
+    uint64_t tid;
+} msg_oct8_t;
+typedef msg_oct8_t msg_hdr_t;
+typedef msg_oct8_t msg_ok_t;
+typedef msg_oct8_t msg_ping_t;
+
+
+/**
+ *  message byte sequences
+ *  --------+----+-----+-----+----+----
+ *  err     | id | vsz | payload
+ *  --------+----+-----+-----+----+----
+ *  data    | id | vsz | payload
+ *  --------+----+-----+-----+----+----
+ *  pull    | id | ksz | payload
+ *  --------+----+-----+-----+----+----
+ */
+typedef struct __attribute__((packed)){
+    uint64_t tid;
+    uint32_t klen;
+} msg_oct12_t;
+
+typedef msg_oct12_t msg_err_t;
+typedef msg_oct12_t msg_data_t;
+typedef msg_oct12_t msg_pull_t;
+
+
+/**
+ *  message byte sequences
+ *  --------+----+-----+-----+----+----
+ *  push    | id | ksz | vsz | payload
+ *  --------+----+-----+-----+----+----
+ */
+typedef struct __attribute__((packed)){
+    uint64_t tid;
+    uint32_t klen;
+    uint32_t vlen;
+} msg_oct16_t;
+
+typedef msg_oct16_t msg_push_t;
+typedef msg_oct16_t msg_t;
+
+
+/**
+ *
+ */
+void *msgio_recv( int sock, int64_t deadline, uint8_t *type );
+int msgio_send( int sock, void *data, int64_t deadline, size_t *sent );
+
+
+/**
  *  e.g.
  *    char buf[BUFSIZ] = { 0 };
  *    int sock = tcp_accept( s, NULL, -1 );

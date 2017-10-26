@@ -4,5 +4,6 @@ bin_PROGRAMS = evheap
 include_HEADERS = evheap.h
 evheap_SOURCES = main.c     \
                  sigch.c    \
+                 msgio.c    \
                  rawio.c    \
                  server.c

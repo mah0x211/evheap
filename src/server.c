@@ -13,63 +13,76 @@
 coroutine static void handle_connection( int sock )
 {
     int64_t deadline = -1;
-    char buf[BUFSIZ] = { 0 };
-    ssize_t len = rawio_recv( sock, buf, BUFSIZ, deadline );
+    size_t sent = 0;
+    uint8_t type = 0;
+    msg_hdr_t *data = NULL;
+    void *next = &&RECV_AGAIN;
 
-    while( len > 0 )
+RECV_AGAIN:
+    if( ( data = msgio_recv( sock, deadline, &type ) ) )
     {
-        if( rawio_send( sock, buf, len, deadline ) != len ){
-            break;
-        }
+        switch( type ){
+            case MSG_REQ_CLOSE:
+                next = &&HANDLE_CLOSE;
+            case MSG_REQ_PING:
+            case MSG_REQ_PULL:
+            case MSG_REQ_PUSH:
+                if( msgio_send( sock, data, deadline, &sent ) == 0 ){
+                    goto *next;
+                }
 
-        len = rawio_recv( sock, buf, BUFSIZ, deadline );
+            default:
+                errno = EBADMSG;
+        }
     }
 
     // if not closed by peer
-    if( len == -1 )
+    switch( errno )
     {
-        switch( errno )
-        {
-            // Deadline was reached.
-            case ETIMEDOUT:
-                if( len == -1 ){
-                    msend( sock, "timed-out", -1, -1 );
-                }
-                break;
+        // no error
+        case 0:
+            break;
 
-            // Not enough memory.
-            case ENOMEM:
-                if( len == -1 ){
-                    msend( sock, "internal server error", -1, -1 );
-                }
-                break;
+        // Deadline was reached.
+        case ETIMEDOUT:
+            if( data ){
+                msend( sock, "timed-out", -1, -1 );
+            }
+            break;
 
-            // Current coroutine is in the process of shutting down.
-            case ECANCELED:
-                perror("coroutine canceled");
-                break;
+        // Not enough memory.
+        case ENOMEM:
+            if( data ){
+                msend( sock, "internal server error", -1, -1 );
+            }
+            break;
 
-            // Closed connection.
-            case EPIPE:
-            // Broken connection.
-            case ECONNRESET:
-                // TODO: print only on debug mode
-                // perror("connection closed by peer");
-                break;
+        // Current coroutine is in the process of shutting down.
+        case ECANCELED:
+            perror("coroutine canceled");
+            break;
 
-            // The socket handle in invalid.
-            // case EBADF:
-            // Invalid arguments.
-            // case EINVAL:
-            // The message was larger than the supplied buffer.
-            // case EMSGSIZE:
-            // The operation is not supported by the socket.
-            // case ENOTSUP:
-            default:
-                perror("failed to handle_connection()");
-        }
+        // Closed connection.
+        case EPIPE:
+        // Broken connection.
+        case ECONNRESET:
+            // TODO: print only on debug mode
+            // perror("connection closed by peer");
+            break;
+
+        // The socket handle in invalid.
+        // case EBADF:
+        // Invalid arguments.
+        // case EINVAL:
+        // The message was larger than the supplied buffer.
+        // case EMSGSIZE:
+        // The operation is not supported by the socket.
+        // case ENOTSUP:
+        default:
+            perror("failed to handle_connection()");
     }
 
+HANDLE_CLOSE:
     if( hclose( sock ) == -1 ){
         perror("failed to hclose()");
     }
