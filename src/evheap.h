@@ -53,6 +53,7 @@ void server_close( server_t *s );
 
 ssize_t rawio_recv( int sock, char *buf, size_t len, int64_t deadline );
 ssize_t rawio_send( int sock, char *buf, size_t len, int64_t deadline );
+#define rawio_recvn(sock, buf, len, deadline) brecv( sock, buf, len, deadline)
 
 
 #endif
