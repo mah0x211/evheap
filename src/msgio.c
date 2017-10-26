@@ -8,6 +8,7 @@
 */
 
 #include "evheap.h"
+#include <arpa/inet.h>
 
 
 static inline void *recv_oct16( uint64_t tid, int sock, int64_t deadline )
