@@ -10,7 +10,7 @@
 #ifndef evheap_h
 #define evheap_h
 
-#include "../deps/libdill/libdill.h"
+#include "libdill.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
