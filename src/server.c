@@ -17,6 +17,7 @@ coroutine static void handle_connection( int sock )
     uint8_t type = 0;
     msg_hdr_t *data = NULL;
     void *next = &&RECV_AGAIN;
+    int rv = 0;
 
 RECV_AGAIN:
     if( ( data = msgio_recv( sock, deadline, &type ) ) )
@@ -27,11 +28,14 @@ RECV_AGAIN:
             case MSG_REQ_PING:
             case MSG_REQ_PULL:
             case MSG_REQ_PUSH:
-                if( msgio_send( sock, data, deadline, &sent ) == 0 ){
+                rv = msgio_send( sock, data, deadline, &sent );
+                if( rv == 0 ){
+                    free( data );
                     goto *next;
                 }
 
             default:
+                free( data );
                 errno = EBADMSG;
         }
     }
