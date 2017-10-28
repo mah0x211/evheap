@@ -31,14 +31,13 @@ typedef struct {
 } server_t;
 
 
-#define server_init()   \
-((server_t){            \
-    .h = -1,            \
-    .sock = -1,         \
-    .addr = {           \
-        .data = {0}     \
-    }                   \
-})
+#define server_initializer {    \
+    .h = -1,                    \
+    .sock = -1,                 \
+    .addr = {                   \
+        .data = {0}             \
+    }                           \
+}
 
 int server_listen( server_t *s, const char *host, int port );
 void server_close( server_t *s );

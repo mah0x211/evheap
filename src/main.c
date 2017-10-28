@@ -66,7 +66,7 @@ static void getcfg( cfg_t *cfg, int argc, char * const argv[] )
 
 int main( int argc, char * const argv[] )
 {
-    server_t s = server_init();
+    server_t s = server_initializer;
     int ch = 0;
     cfg_t cfg = {
         .host = DEFAULT_HOST,
