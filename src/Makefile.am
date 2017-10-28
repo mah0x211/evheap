@@ -1,4 +1,4 @@
-AM_CPPFLAGS = -I../deps/libdill @WARNINGS@
+AM_CPPFLAGS = -I../deps/libdill -I../deps/bitvec @WARNINGS@
 LDADD = ../deps/libdill/.libs/libdill.a
 bin_PROGRAMS = evheap
 include_HEADERS = evheap.h
