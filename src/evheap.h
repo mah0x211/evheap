@@ -36,7 +36,8 @@ typedef struct {
     .sock = -1,                 \
     .addr = {                   \
         .data = {0}             \
-    }                           \
+    },                          \
+    .ctx = hctx_initializer     \
 }
 
 int server_listen( server_t *s, const char *host, int port );

@@ -22,6 +22,15 @@ typedef struct {
     int used;
 } hctx_t;
 
+#define hctx_initializer {      \
+    .tbl = dynarr_initializer,  \
+    .ids = {                    \
+        .nbit = 0,              \
+        .nvec = 0,              \
+        .vec = NULL             \
+    },                          \
+    .used = -1                  \
+}
 
 int hctx_alloc( hctx_t *ctx );
 void hctx_dealloc( hctx_t *ctx );

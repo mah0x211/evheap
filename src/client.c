@@ -75,7 +75,7 @@ coroutine void client_co( hctx_t *ctx, int id, int sock )
     int64_t deadline = -1;
     uint8_t type = 0;
     void *data = NULL;
-    hctx_t cctx;
+    hctx_t cctx = hctx_initializer;
     int rv = hctx_alloc( &cctx );
 
     if( rv == -1 ){
