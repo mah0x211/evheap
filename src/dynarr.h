@@ -18,6 +18,11 @@ typedef struct {
     int *arr;
 } dynarr_t;
 
+#define dynarr_initializer {    \
+    .len = 0,                   \
+    .arr = NULL                 \
+}
+
 int dynarr_alloc( dynarr_t *map, size_t len );
 void dynarr_dealloc( dynarr_t *map );
 int dynarr_get( dynarr_t *map, int idx );
