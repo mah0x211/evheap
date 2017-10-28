@@ -5,6 +5,7 @@ include_HEADERS = evheap.h
 evheap_SOURCES = main.c     \
                  sigch.c    \
                  dynarr.c   \
+                 hctx.c     \
                  msgio.c    \
                  rawio.c    \
                  server.c
