@@ -8,4 +8,5 @@ evheap_SOURCES = main.c     \
                  hctx.c     \
                  msgio.c    \
                  rawio.c    \
-                 server.c
+                 server.c   \
+                 client.c

@@ -20,6 +20,9 @@
 int sigch_init( void );
 
 
+/**
+ *  server data and related functions
+ */
 typedef struct {
     int h;
     int sock;
@@ -49,6 +52,12 @@ void server_close( server_t *s );
 #define SERVER_ADDRLEN      IPADDR_MAXSTRLEN
 #define server_addr(s, buf) ipaddr_str(&(s)->addr, (buf))
 #define server_port(s)      ipaddr_port( &(s)->addr )
+
+
+/**
+ *  client data and related functions
+ */
+coroutine void client_co( hctx_t *ctx, int id, int sock );
 
 
 /**
@@ -178,13 +187,15 @@ typedef msg_oct16_t msg_t;
 
 
 /**
- *
+ *  message input/output functions
  */
 void *msgio_recv( int sock, int64_t deadline, uint8_t *type );
 int msgio_send( int sock, void *data, int64_t deadline, size_t *sent );
 
 
 /**
+ *  bytestream input/output funcitons
+ *
  *  e.g.
  *    char buf[BUFSIZ] = { 0 };
  *    int sock = tcp_accept( s, NULL, -1 );
