@@ -83,7 +83,7 @@ int main( int argc, char * const argv[] )
         perror("failed to hctx_alloc()");
         return EXIT_FAILURE;
     }
-    else if( ( ch = sigch_init() ) == -1 ){
+    else if( ( ch = sigch_init( SIGINT, 0 ) ) == -1 ){
         perror("failed to sigch_init()");
         return EXIT_FAILURE;
     }

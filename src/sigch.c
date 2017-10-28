@@ -9,6 +9,7 @@
 
 #include "evheap.h"
 #include <signal.h>
+#include <stdarg.h>
 
 
 static int FD_RCV = -1;
@@ -48,29 +49,49 @@ static void sendch( int sig )
 }
 
 
-int sigch_init( void )
+static int setsigact( int sig )
+{
+    struct sigaction act;
+
+    memset( (void*)&act, 0, sizeof( act ) );
+    act.sa_handler = sendch;
+    act.sa_flags = SA_RESTART;
+
+    return sigaction( sig, &act, NULL );
+}
+
+
+int sigch_init( int sig, ... )
 {
     int fds[2] = { -1, -1 };
 
     if( pipe( fds ) != -1 )
     {
         int ch = 0;
-        struct sigaction act;
         sigset_t sblk;
+        va_list ap;
 
         FD_RCV = fds[0];
         FD_SND = fds[1];
 
-        memset( (void*)&act, 0, sizeof( act ) );
-        act.sa_handler = sendch;
-        act.sa_flags = SA_RESTART;
-
         sigfillset( &sblk );
-            // block all signal except SIGINT
-        if( sigdelset( &sblk, SIGINT ) == 0 &&
-            sigprocmask( SIG_BLOCK, &sblk, NULL ) == 0 &&
-            sigaction( SIGINT, &act, NULL ) != -1 &&
-            // create channel
+        va_start( ap, sig );
+        do
+        {
+            if( sigdelset( &sblk, sig ) == -1 ){
+                perror( "failed to sigdelset()" );
+                va_end( ap );
+                goto FAIL;
+            }
+            else if( setsigact( sig ) == -1 ){
+                perror( "failed to setsigact()" );
+                va_end( ap );
+                goto FAIL;
+            }
+        } while( ( sig = va_arg( ap, int ) ) );
+        va_end( ap );
+
+        if( sigprocmask( SIG_BLOCK, &sblk, NULL ) == 0 &&
             ( ch = chmake( sizeof( ch ) ) ) != -1 )
         {
             // wait a signal with coroutine
@@ -80,6 +101,7 @@ int sigch_init( void )
             hclose( ch );
         }
 
+FAIL:
         close( FD_RCV );
         close( FD_SND );
     }

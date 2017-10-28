@@ -17,7 +17,7 @@
 #include "hctx.h"
 
 
-int sigch_init( void );
+int sigch_init( int sig, ... );
 
 
 /**
