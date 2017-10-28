@@ -10,7 +10,7 @@
 #include "evheap.h"
 
 
-coroutine static void handle_connection( int sock )
+coroutine static void handle_connection( hctx_t *ctx, int id, int sock )
 {
     int64_t deadline = -1;
     size_t sent = 0;
@@ -90,6 +90,7 @@ HANDLE_CLOSE:
     if( hclose( sock ) == -1 ){
         perror("failed to hclose()");
     }
+    handle_close( ctx, id );
 }
 
 
@@ -102,7 +103,7 @@ coroutine static void handle_accept( server_t *s )
 
         if( sock != -1 )
         {
-            if( go( handle_connection( sock ) ) != -1 ){
+            if( handle( &s->ctx, handle_connection, sock ) == 0 ){
                 continue;
             }
             hclose( sock );
@@ -152,5 +153,6 @@ void server_close( server_t *s )
 {
     hclose( s->h );
     hclose( s->sock );
+    hctx_dealloc( &s->ctx );
 }
 

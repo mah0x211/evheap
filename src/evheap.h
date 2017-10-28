@@ -10,11 +10,11 @@
 #ifndef evheap_h
 #define evheap_h
 
-#include "libdill.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include "hctx.h"
 
 
 int sigch_init( void );
@@ -24,6 +24,7 @@ typedef struct {
     int h;
     int sock;
     struct ipaddr addr;
+    hctx_t ctx;
 } server_t;
 
 
