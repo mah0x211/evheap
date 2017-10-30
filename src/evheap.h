@@ -15,6 +15,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "hctx.h"
+#include "rawio.h"
 
 
 int sigch_init( int sig, ... );
@@ -192,19 +193,6 @@ typedef msg_oct16_t msg_t;
 void *msgio_recv( int sock, int64_t deadline, uint8_t *type );
 int msgio_send( int sock, void *data, int64_t deadline, size_t *sent );
 
-
-/**
- *  bytestream input/output funcitons
- *
- *  e.g.
- *    char buf[BUFSIZ] = { 0 };
- *    int sock = tcp_accept( s, NULL, -1 );
- *    ssize_t len = rawio_recv( sock, buf, BUFSIZ, deadline );
- *    ssize_t sent = rawio_send( sock, buf, len, deadline );
- */
-ssize_t rawio_recv( int sock, char *buf, size_t len, int64_t deadline );
-ssize_t rawio_send( int sock, char *buf, size_t len, int64_t deadline );
-#define rawio_recvn(sock, buf, len, deadline) brecv( sock, buf, len, deadline)
 
 
 #endif
