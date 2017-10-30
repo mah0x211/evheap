@@ -7,9 +7,7 @@
 
 */
 
-#include "evheap.h"
-#include <sys/types.h>
-#include <sys/socket.h>
+#include "rawio.h"
 
 
 DILL_EXPORT extern int tcp_fd(int s);

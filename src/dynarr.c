@@ -16,7 +16,7 @@
 #define VALSIZE sizeof(int)
 
 
-int dynarr_alloc( dynarr_t *da, size_t len )
+int dynarr_init( dynarr_t *da, size_t len )
 {
     da->arr = calloc( len, VALSIZE );
     if( da->arr ){

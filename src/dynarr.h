@@ -23,11 +23,11 @@ typedef struct {
     .arr = NULL                 \
 }
 
-int dynarr_alloc( dynarr_t *map, size_t len );
-void dynarr_dealloc( dynarr_t *map );
-int dynarr_get( dynarr_t *map, int idx );
-int dynarr_del( dynarr_t *map, int idx );
-int dynarr_set( dynarr_t *map, int idx, int val );
+int dynarr_init( dynarr_t *da, size_t len );
+void dynarr_dealloc( dynarr_t *da );
+int dynarr_get( dynarr_t *da, int idx );
+int dynarr_del( dynarr_t *da, int idx );
+int dynarr_set( dynarr_t *da, int idx, int val );
 
 
 #endif /* dynarr_h */

@@ -20,7 +20,7 @@ int hctx_alloc( hctx_t *ctx )
 {
     if( bitvec_init( &ctx->ids, DEFUALT_SIZE ) == 0 )
     {
-        if( dynarr_alloc( &ctx->tbl, DEFUALT_SIZE ) == 0 ){
+        if( dynarr_init( &ctx->tbl, DEFUALT_SIZE ) == 0 ){
             ctx->used = -1;
             return 0;
         }
