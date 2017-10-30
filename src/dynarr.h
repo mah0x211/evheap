@@ -24,7 +24,7 @@ typedef struct {
 }
 
 int dynarr_init( dynarr_t *da, size_t len );
-void dynarr_dealloc( dynarr_t *da );
+void dynarr_dispose( dynarr_t *da );
 int dynarr_get( dynarr_t *da, int idx );
 int dynarr_del( dynarr_t *da, int idx );
 int dynarr_set( dynarr_t *da, int idx, int val );

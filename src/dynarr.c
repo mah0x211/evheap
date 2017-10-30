@@ -28,7 +28,7 @@ int dynarr_init( dynarr_t *da, size_t len )
 }
 
 
-void dynarr_dealloc( dynarr_t *da )
+void dynarr_dispose( dynarr_t *da )
 {
     free( (void*)da->arr );
 }
