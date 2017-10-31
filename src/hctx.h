@@ -32,7 +32,7 @@ typedef struct {
     .used = -1                  \
 }
 
-int hctx_alloc( hctx_t *ctx );
+int hctx_init( hctx_t *ctx );
 void hctx_dealloc( hctx_t *ctx );
 int hctx_get( hctx_t *ctx );
 int hctx_set( hctx_t *ctx, int id, int h );

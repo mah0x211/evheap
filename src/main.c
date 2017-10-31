@@ -79,8 +79,8 @@ int main( int argc, char * const argv[] )
     setvbuf( stdout, NULL, _IONBF, 0 );
     setvbuf( stderr, NULL, _IONBF, 0 );
 
-    if( hctx_alloc( &s.ctx ) == -1 ){
-        perror("failed to hctx_alloc()");
+    if( hctx_init( &s.ctx ) == -1 ){
+        perror("failed to hctx_init()");
         return EXIT_FAILURE;
     }
     else if( ( ch = sigch_init( SIGINT, 0 ) ) == -1 ){

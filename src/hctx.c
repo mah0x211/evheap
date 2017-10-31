@@ -16,7 +16,7 @@
 #define DEFUALT_SIZE    4096
 
 
-int hctx_alloc( hctx_t *ctx )
+int hctx_init( hctx_t *ctx )
 {
     if( bitvec_init( &ctx->ids, DEFUALT_SIZE ) == 0 )
     {
