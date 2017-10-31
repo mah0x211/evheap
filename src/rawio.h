@@ -10,9 +10,27 @@
 #ifndef rawio_h
 #define rawio_h
 
-#include "evheap.h"
 #include <sys/types.h>
-#include <sys/socket.h>
+
+
+typedef struct {
+    size_t cap;
+    size_t tail;
+    size_t head;
+    char *buf;
+    int fd;
+} rawio_t;
+
+#define rawio_initializer { \
+    .cap = 0,               \
+    .tail = 0,              \
+    .head = 0,              \
+    .buf = NULL,            \
+    .fd = -1                \
+}
+
+int rawio_init( rawio_t *r, int sock, size_t cap );
+void rawio_dispose( rawio_t *r );
 
 
 /**
@@ -24,9 +42,9 @@
  *    ssize_t len = rawio_recv( sock, buf, BUFSIZ, deadline );
  *    ssize_t sent = rawio_send( sock, buf, len, deadline );
  */
-ssize_t rawio_recv( int sock, char *buf, size_t len, int64_t deadline );
-ssize_t rawio_send( int sock, char *buf, size_t len, int64_t deadline );
-#define rawio_recvn(sock, buf, len, deadline) brecv( sock, buf, len, deadline)
+int rawio_recv( rawio_t *r, char *buf, size_t *len, int64_t deadline );
+int rawio_recvn( rawio_t *r, char *buf, size_t *len, int64_t deadline );
+ssize_t rawio_send( rawio_t *r, char *buf, size_t len, int64_t deadline );
 
 
 #endif /* rawio_h */

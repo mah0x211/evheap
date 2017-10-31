@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include "libdill.h"
 #include "hctx.h"
 #include "rawio.h"
 
@@ -190,8 +191,8 @@ typedef msg_oct16_t msg_t;
 /**
  *  message input/output functions
  */
-void *msgio_recv( int sock, int64_t deadline, uint8_t *type );
-int msgio_send( int sock, void *data, int64_t deadline, size_t *sent );
+void *msgio_recv( rawio_t *r, int64_t deadline, uint8_t *type );
+int msgio_send( rawio_t *r, void *data, int64_t deadline, size_t *sent );
 
 
 
