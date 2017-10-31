@@ -31,7 +31,7 @@ int hctx_init( hctx_t *ctx )
 }
 
 
-void hctx_dealloc( hctx_t *ctx )
+void hctx_dispose( hctx_t *ctx )
 {
     bitvec_dispose( &ctx->ids );
     dynarr_dispose( &ctx->tbl );

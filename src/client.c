@@ -155,7 +155,7 @@ RECV_NEXT:
             perror("failed to handle_connection()");
     }
 
-    hctx_dealloc( &cctx );
+    hctx_dispose( &cctx );
 
 DONE:
     if( hclose( sock ) == -1 ){

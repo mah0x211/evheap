@@ -69,6 +69,6 @@ void server_close( server_t *s )
 {
     hclose( s->h );
     hclose( s->sock );
-    hctx_dealloc( &s->ctx );
+    hctx_dispose( &s->ctx );
 }
 
